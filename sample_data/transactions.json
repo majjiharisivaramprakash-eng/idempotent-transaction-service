@@ -1,0 +1,142 @@
+{
+  "transactions": [
+    {
+      "request_id": "req-1002",
+      "transaction_id": "txn-1002",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 250000,
+      "currency": "INR",
+      "sequence_number": 2
+    },
+    {
+      "request_id": "req-1001",
+      "transaction_id": "txn-1001",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 500000,
+      "currency": "INR",
+      "sequence_number": 1
+    },
+    {
+      "request_id": "req-1001",
+      "transaction_id": "txn-1001",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 500000,
+      "currency": "INR",
+      "sequence_number": 1
+    },
+    {
+      "request_id": "req-1001-dup",
+      "transaction_id": "txn-1001",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 500000,
+      "currency": "INR",
+      "sequence_number": 1
+    },
+    {
+      "request_id": "req-1002",
+      "transaction_id": "txn-1002",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 999999,
+      "currency": "INR",
+      "sequence_number": 2
+    },
+    {
+      "request_id": "req-1003",
+      "transaction_id": "txn-1003",
+      "account_id": "ACC-1001",
+      "transaction_type": "DEBIT",
+      "amount_minor": 100000,
+      "currency": "INR",
+      "sequence_number": 3
+    },
+    {
+      "request_id": "req-2001",
+      "transaction_id": "txn-2001",
+      "account_id": "ACC-2002",
+      "transaction_type": "CREDIT",
+      "amount_minor": 300000,
+      "currency": "INR",
+      "sequence_number": 1
+    },
+    {
+      "request_id": "req-2002",
+      "transaction_id": "txn-2002",
+      "account_id": "ACC-2002",
+      "transaction_type": "CREDIT",
+      "amount_minor": 1111,
+      "currency": "INR",
+      "sequence_number": 2
+    },
+    {
+      "request_id": "req-2003",
+      "transaction_id": "txn-2003",
+      "account_id": "ACC-2002",
+      "transaction_type": "CREDIT",
+      "amount_minor": 2222,
+      "currency": "INR",
+      "sequence_number": 3
+    },
+    {
+      "request_id": "req-2004",
+      "transaction_id": "txn-2004",
+      "account_id": "ACC-2002",
+      "transaction_type": "CREDIT",
+      "amount_minor": 77777,
+      "currency": "INR",
+      "sequence_number": 4
+    },
+    {
+      "request_id": "req-3001",
+      "transaction_id": "txn-3001",
+      "account_id": "ACC-3003",
+      "transaction_type": "DEBIT",
+      "amount_minor": 50000,
+      "currency": "INR",
+      "sequence_number": 1
+    },
+    {
+      "request_id": "req-4005",
+      "transaction_id": "txn-4005",
+      "account_id": "ACC-4004",
+      "transaction_type": "CREDIT",
+      "amount_minor": 100000,
+      "currency": "INR",
+      "sequence_number": 5
+    },
+    {
+      "request_id": "req-9001",
+      "transaction_id": "txn-9001",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": -100,
+      "currency": "INR",
+      "sequence_number": 10
+    },
+    {
+      "request_id": "req-9002",
+      "transaction_id": "txn-9002",
+      "account_id": "ACC-1001",
+      "transaction_type": "CREDIT",
+      "amount_minor": 100000,
+      "currency": "USD",
+      "sequence_number": 11
+    }
+  ],
+  "_notes": {
+    "ACC-1001": "sequence 2 is submitted BEFORE sequence 1: ordering must defer it, then apply both in order when seq 1 arrives",
+    "replay": "req-1001 submitted twice with identical payload: second submission is a no-op replay",
+    "duplicate": "req-1001-dup carries txn-1001 under a different request key: no second financial effect",
+    "conflict": "req-1002 reused with a different amount: rejected as a conflict",
+    "txn-2002": "amount 1111 is the transient fault sentinel: fails once, succeeds on retry",
+    "txn-2003": "amount 2222 is the permanent fault sentinel: exhausts retries and becomes FAILED",
+    "txn-2004": "head-of-line blocked behind the failed txn-2003: stays PENDING_ORDER (observable, recoverable)",
+    "txn-3001": "debit without funding: deterministic INSUFFICIENT_FUNDS failure, never retried",
+    "txn-4005": "sequence gap (1..4 missing): waits indefinitely as PENDING_ORDER",
+    "txn-9001/txn-9002": "invalid records: rejected by validation without stopping the batch"
+  }
+}
